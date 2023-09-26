@@ -38,16 +38,15 @@ let lastId = 3;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//Write your code here//
 
-//CHALLENGE 1: GET All posts
+// GET All posts
 
 app.get("/posts", (req,res) => {
-      console.log(posts);
+      // console.log(posts);
       res.json(posts);
 } );
 
-//CHALLENGE 2: GET a specific post by id
+// GET a specific post by id
 
 app.get("/posts/:id", (req,res)=>{
      const id = parseInt(req.params.id)
@@ -59,7 +58,7 @@ app.get("/posts/:id", (req,res)=>{
 
 
 
-//CHALLENGE 3: POST a new post
+//POST a new post
 
 app.post("/posts", (req,res)=>{
   const  newId = lastId + 1;
@@ -81,25 +80,39 @@ app.post("/posts", (req,res)=>{
 
 });
 
-//CHALLENGE 4: PATCH a post when you just want to update one parameter
+//PATCH a post when you just want to update one parameter
 
-app.patch("/posts/:id", (req,res)=>{
-   
+
+app.patch("/posts/:id", (req, res) => {
   const id = parseInt(req.params.id);
+  const postIndex = posts.findIndex((post) => post.id === id);
+   console.log(postIndex)
+  if (postIndex === -1) {
+    return res.status(404).json({ message: "Invalid Id" });
+  }
 
-  const post = posts.find((po)=> posts.id === id);
+  const post = posts[postIndex];
 
-if(!post) return res.status(404).json({message: "Invalid Id "})
+  if (req.body.title) {
+    post.title = req.body.title;
+  }
+  if (req.body.content) {
+    post.content = req.body.content;
+  }
+  
+  if (req.body.author) {
+    post.author = req.body.author;
+  }
 
-if(req.body.title) post.title = req.body.title;
-if(req.body.content) post.content = req.body.content;
-if(req.body.author) post.author = req.body.author;
-
-   res.json(post);
-
+  // Make sure to update the post in the original array
+  posts[postIndex] = post;
+  // console.log("Updated Post:", post);
+  // console.log("Request Body:", req.body);
+  res.json(post);
 });
 
-//CHALLENGE 5: DELETE a specific post by providing the post id.
+
+// DELETE a specific post by providing the post id.
 
 app.delete("/posts/:id", (req,res)=>{
 
